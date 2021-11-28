@@ -34,7 +34,7 @@ with open(VOCABULARY_PATH, 'r', encoding='utf-8') as file:
 processed_image_names = []
 extracted_text = []
 
-for image_path in glob.glob(VALIDATION_DATASET_PATH + "*.png"):
+for image_path in glob.glob(VALIDATION_DATASET_PATH + "*.bmp"):
     image_directory, image_name = os.path.split(image_path)
     processed_image_names.append(image_name)
     extracted_text.append(extract_text_from_image(model, image_path, vocabulary))
