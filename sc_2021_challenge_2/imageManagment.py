@@ -181,33 +181,59 @@ def got_umlaut(x0, x1, w0, w1):
     return x0 + w0 + 5 > x1 + w1 and x0 < x1    #this_rect[0] + this_rect[2] + 5 > next_rect[0] + next_rect[2]  and this_rect[0] < next_rect[0]
 
 
-def return_letters_with_kmeans(image_path):
+#https://developpaper.com/python-opencv-implementation-of-rotating-text-correction/
+def rotation(image_path):
     img = cv2.imread(image_path)
-    img_copy = img.copy()
-    #img = resize_photo(img)
-    #newW = int(img.shape[1] * 1.2)
-    #newH = int(img.shape[0] * 1.2)
-
-    #resized_img = cv2.resize(img, (int(newW), int(newH)), interpolation=cv2.INTER_NEAREST)
-  
     img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     img_bgr = cv2.cvtColor(img_hsv, cv2.COLOR_HSV2BGR)
     img_gs = cv2.cvtColor(img_bgr, cv2.COLOR_RGB2GRAY)
-    #img_gs = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     img_t = 1 - img_gs
-    ret, img_bin = cv2.threshold(img_t, 250, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
-    image_orig, letters, region_distances = my_select_roi(img_copy, img_bin)
-    #plt.imshow(image_orig)
-    #plt.show()
+    thresh = cv2.adaptiveThreshold(img_t, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 39, 3)
+    img_bin = 255 - thresh
+    ret, img_bin = cv2.threshold(img_bin, 30, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
 
-    distances = np.array(region_distances).reshape(len(region_distances), 1)
+
+    # gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    # img_t = cv2.bitwise_not(gray)
+
+    # #ret, img_bin = cv2.threshold(img_t, 250, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+    # ret, thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)
+
+
+    imgasdad, contours, hierarchy = cv2.findContours(img_bin.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    angles = []
+    for contour in contours: 
+        angle = cv2.minAreaRect(contour)[-1]
+        if angle < -45:
+            angle = -(90+ angle)
+        else:
+            angle = -angle
+        angles.append(angle)
+    
+    for a in angles.copy():
+        if abs(a) < 5:
+            angles.remove(a)
+
+    (h,w) = img.shape[:2]
+    center = (w//2, h//2)
+    
 
     try:
-        k_means = KMeans(n_clusters=2, max_iter=2000, tol=0.00001, n_init=10)
-        k_means.fit(distances)
-    except:
-        return letters, None
-    print(len(letters))
+        smallest_angle = min(angles, key=abs)
+    except Exception as e:
+        smallest_angle = 0
 
-    return letters, k_means
+    if abs(smallest_angle) > 5.2:
+        smallest_angle = 0
 
+    #best_angle = min(angles, key=abs)
+    print('Rotation angle :{:.3f}'.format(smallest_angle))
+
+    if smallest_angle < 10:
+        M = cv2.getRotationMatrix2D(center, -smallest_angle, 1.0)
+        rotated = cv2.warpAffine(img, M, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
+    else:
+        M = cv2.getRotationMatrix2D(center, smallest_angle, 1.0)
+        rotated = cv2.warpAffine(img, M, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
+        
+    return rotated
