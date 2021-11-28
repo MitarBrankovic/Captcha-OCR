@@ -193,6 +193,7 @@ def return_letters_with_kmeans(image_path):
     img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     img_bgr = cv2.cvtColor(img_hsv, cv2.COLOR_HSV2BGR)
     img_gs = cv2.cvtColor(img_bgr, cv2.COLOR_RGB2GRAY)
+    #img_gs = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     img_t = 1 - img_gs
     ret, img_bin = cv2.threshold(img_t, 250, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
     image_orig, letters, region_distances = my_select_roi(img_copy, img_bin)

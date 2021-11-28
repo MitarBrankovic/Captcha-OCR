@@ -7,6 +7,7 @@ import collections
 from keras.models import Sequential
 from keras.layers.core import Dense,Activation
 from keras.optimizers import SGD
+from fuzzywuzzy import fuzz
 
 import neuralNetwork as nn
 import imageManagment as im
@@ -86,6 +87,40 @@ def extract_text_from_image(trained_model, image_path, vocabulary):
     else:
         extracted_text = im.display_result(predicted, nn.make_alphabet(), k_means)
 
-    print(extracted_text)
+    #print(extracted_text)
 
-    return extracted_text
+    fuzzy_extracted_text = ""
+    for extracted_word in list(extracted_text.split(' ')):
+        vocabulary_words = list(vocabulary.keys())
+        same_word = False
+        final_word = ""
+        nearest_words = []
+        lowest_distance=500
+        for word in vocabulary_words:
+            if word == extracted_word:
+                final_word = word
+                same_word = True
+            else:
+                distance = fuzz.ratio(word,extracted_word)
+                if distance < lowest_distance:
+                    lowest_distance = distance
+                elif distance == lowest_distance:
+                    nearest_words.append([word, vocabulary[word]])
+
+        if not same_word:
+            word_repetition = 0
+            for word_distance_repet in nearest_words:
+                if int(word_distance_repet[1])>word_repetition:
+                    final_word=word_distance_repet[0]
+                    word_repetition=int(word_distance_repet[1])
+
+
+        if final_word is not None:
+            fuzzy_extracted_text += final_word + " "
+        else:
+            fuzzy_extracted_text += extracted_word + ""
+        fuzzy_extracted_text.rstrip() #za brisanje " " na kraju stringa
+    
+    print(fuzzy_extracted_text)
+
+    return fuzzy_extracted_text
