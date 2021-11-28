@@ -30,7 +30,7 @@ def train_ann(ann, X_train, y_train):
 
     sgd = SGD(lr=0.01, momentum=0.9)
     ann.compile(loss='mean_squared_error', optimizer=sgd)
-    ann.fit(X_train, y_train, epochs=4200, batch_size=1, verbose = 0, shuffle=False) 
+    ann.fit(X_train, y_train, epochs=4200, batch_size=1, verbose = 1, shuffle=False) 
       
     return ann
 
@@ -54,15 +54,16 @@ def load_trained_ann():
 
 
 def make_alphabet():
-    alphabet_first_picture = ['A', 'B', 'C', 'Č', 'Ć', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
-                                'N', 'O', 'P', 'Q','R', 'S', 'Š', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'Ž']
+    alphabet_first_picture = ['a', 'b', 'c', 'č', 'ć', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
+                                'n', 'o', 'p', 'q','r', 's', 'š', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'ž']
 
     all_letters = []
+    
     for letter in alphabet_first_picture:
+        letter = letter.upper()
         all_letters.append(letter)
 
     for letter in alphabet_first_picture:
-        letter = letter.lower()
         all_letters.append(letter)
 
     return all_letters
