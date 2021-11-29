@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt 
 import collections
 from sklearn.cluster import KMeans
+from sklearn.linear_model import LinearRegression
 
 from keras.models import Sequential
 from keras.layers.core import Dense,Activation
@@ -236,4 +237,51 @@ def rotation(image_path):
         M = cv2.getRotationMatrix2D(center, smallest_angle, 1.0)
         rotated = cv2.warpAffine(img, M, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
         
+    return rotated
+
+
+def rotation_lin_regression(image_path):
+    img = cv2.imread(image_path)
+    img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    img_bgr = cv2.cvtColor(img_hsv, cv2.COLOR_HSV2BGR)
+    img_gs = cv2.cvtColor(img_bgr, cv2.COLOR_RGB2GRAY)
+    img_t = 1 - img_gs
+    thresh = cv2.adaptiveThreshold(img_t, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 39, 3)
+    img_bin = 255 - thresh
+    ret, img_bin = cv2.threshold(img_bin, 30, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+
+
+    x_array = []
+    y_array = []
+    imgasdad, contours, hierarchy = cv2.findContours(img_bin.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    angles = []
+    for contour in contours: 
+        center, size, angle = cv2.minAreaRect(contour)
+        if size[0] > 5 and size[1] > 5:
+            x_array.append(center[0])
+            y_array.append(center[1])
+    
+    x_array = np.array(x_array)
+    y_array = np.array(y_array)
+    x_array = x_array.reshape(-1, 1)
+    regression = LinearRegression().fit(x_array, y_array)
+
+    (h, w) = img.shape[0:2]
+    center = (w//2, h//2)
+
+    best_angle = regression.coef_ *180/np.pi
+    print(best_angle)
+
+    if best_angle > 2:
+        M = cv2.getRotationMatrix2D(center, -best_angle, 1.0)
+        rotated = cv2.warpAffine(img, M, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
+    elif best_angle < 2:
+        M = cv2.getRotationMatrix2D(center, best_angle, 1.0)
+        rotated = cv2.warpAffine(img, M, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
+    else:
+        zero_angle = 0
+        M = cv2.getRotationMatrix2D(center, zero_angle, 1.0)
+        rotated = cv2.warpAffine(img, M, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
+        
+    
     return rotated

@@ -82,7 +82,7 @@ def extract_text_from_image(trained_model, image_path, vocabulary):
 
     img = cv2.imread(image_path)
     img_copy = img.copy()
-    img_rotated = im.rotation(image_path)
+    img_rotated = im.rotation_lin_regression(image_path)
     #plt.imshow(img_rotated)
     #plt.show()
   
@@ -100,9 +100,9 @@ def extract_text_from_image(trained_model, image_path, vocabulary):
     img_rotated_t = 1 - img_rotated_gs
     ret, img_rotated_bin = cv2.threshold(img_rotated_t, 250, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
 
-    image_orig, letters, region_distances = im.my_select_roi(img_rotated, img_bin)
-    #plt.imshow(image_orig)
-    #plt.show()
+    image_orig, letters, region_distances = im.my_select_roi(img_rotated, img_rotated_bin)
+    plt.imshow(image_orig)
+    plt.show()
 
     distances = np.array(region_distances).reshape(len(region_distances), 1)
     kmeans_exist = False
