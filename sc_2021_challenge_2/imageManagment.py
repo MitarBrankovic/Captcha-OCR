@@ -166,7 +166,7 @@ def letters_with_umlaut(sorted_rectangles):
     for i in range(0, len(sorted_rectangles) - 1):
         this_rect = sorted_rectangles[i]
         next_rect = sorted_rectangles[i + 1]
-        if got_umlaut(this_rect[0], next_rect[0], this_rect[2], next_rect[2]):
+        if (this_rect[0] + this_rect[2] + 6 > next_rect[0] + next_rect[2])  and (this_rect[0] < next_rect[0]):
             rectangles_umlauts.append(next_rect)
             new_rect = (this_rect[0], next_rect[1], this_rect[2], this_rect[3] + next_rect[3] + 5)
             final_rectangles[i] = new_rect
@@ -176,10 +176,6 @@ def letters_with_umlaut(sorted_rectangles):
             final_rectangles.remove(rect)
 
     return final_rectangles
-
-
-def got_umlaut(x0, x1, w0, w1):
-    return x0 + w0 + 6 > x1 + w1 and x0 < x1    #this_rect[0] + this_rect[2] + 5 > next_rect[0] + next_rect[2]  and this_rect[0] < next_rect[0]
 
 
 #https://developpaper.com/python-opencv-implementation-of-rotating-text-correction/
