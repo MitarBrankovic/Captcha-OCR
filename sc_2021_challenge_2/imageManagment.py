@@ -179,7 +179,7 @@ def letters_with_umlaut(sorted_rectangles):
 
 
 def got_umlaut(x0, x1, w0, w1):
-    return x0 + w0 + 5 > x1 + w1 and x0 < x1    #this_rect[0] + this_rect[2] + 5 > next_rect[0] + next_rect[2]  and this_rect[0] < next_rect[0]
+    return x0 + w0 + 6 > x1 + w1 and x0 < x1    #this_rect[0] + this_rect[2] + 5 > next_rect[0] + next_rect[2]  and this_rect[0] < next_rect[0]
 
 
 #https://developpaper.com/python-opencv-implementation-of-rotating-text-correction/
@@ -239,7 +239,7 @@ def rotation(image_path):
         
     return rotated
 
-
+#https://realpython.com/linear-regression-in-python/
 def rotation_lin_regression(image_path):
     img = cv2.imread(image_path)
     img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)

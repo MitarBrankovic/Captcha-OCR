@@ -30,7 +30,7 @@ def train_ann(ann, X_train, y_train):
 
     sgd = SGD(lr=0.01, momentum=0.9)
     ann.compile(loss='mean_squared_error', optimizer=sgd)
-    ann.fit(X_train, y_train, epochs=4400, batch_size=1, verbose = 1, shuffle=False) 
+    ann.fit(X_train, y_train, epochs=4350, batch_size=1, verbose = 1, shuffle=False) 
       
     return ann
 
