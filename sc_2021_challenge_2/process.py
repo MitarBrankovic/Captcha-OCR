@@ -118,7 +118,7 @@ def extract_text_from_image(trained_model, image_path, vocabulary):
     predicted = trained_model.predict(np.array(prepared, np.float32))
 
     if k_means is None:
-        extracted_text="I have error it"
+        extracted_text="I now have error if do it"
     else:
         extracted_text = im.display_result(predicted, nn.make_alphabet(), k_means)
 
